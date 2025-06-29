@@ -7,82 +7,95 @@ import java.util.*;
 public class BureauVote {
     private String code;
     private Commune commune;
-    // private ArrayList<Candidat> candidats = new ArrayList<>();
     private HashMap<Candidat, Integer> votesMap;
     private static ArrayList<BureauVote> bureauxExistants = new ArrayList<>();
     private static final String filePath = "data/BureauVote.txt";
 
-    public static BureauVote get(String code){
-        if (bureauExists(code)){
-            for (BureauVote bv : bureauxExistants){
-                if (bv.getCode().equals(code))
-                    return bv;
-            }
-            return null; // ne devrait pas arriver
-        } else {
-            BureauVote bv = new BureauVote(code);
-            addNewBureau(bv);
-            return bv;
-        }
-    }
-
-    private BureauVote(String code){
+    private BureauVote(String code) {
+        this.code = code.trim();
         this.votesMap = new HashMap<>();
-        this.code = code;
     }
 
-    public String getCode(){ return this.code; }
-    public Commune getCommune() { return this.commune; }
-    public Set<Candidat> getCandidats(){ return votesMap.keySet(); }
-    public Map<Candidat, Integer> getVotesMap(){ return votesMap; }
-    public void setCommune(Commune commune){ this.commune = commune; }
-    public void addCandidat(Candidat candidat) { this.votesMap.put(candidat, 0); }
-
-    public static void addNewBureau(BureauVote bv){
-        bureauxExistants.add(bv);
-    }
-
-    public static boolean bureauExists(String code){
-        for (BureauVote bv : bureauxExistants){
-            if (bv.getCode().equals(code))
-                return true;
+    public static BureauVote get(String code) {
+        code = code.trim();
+        for (BureauVote bv : bureauxExistants) {
+            if (bv.getCode().equals(code)) {
+                return bv;
+            }
         }
-        return false;
+        BureauVote bv = new BureauVote(code);
+        bureauxExistants.add(bv);
+        return bv;
     }
 
-    public static ArrayList<BureauVote> getAll() { return bureauxExistants; }
-
-    public void setVotesCandidat(Candidat c, int votes){
-        this.votesMap.put(c, votes);
+    public String getCode() {
+        return code;
     }
-    public int getVotesOf(Candidat c){
+
+    public Commune getCommune() {
+        return commune;
+    }
+
+    public void setCommune(Commune commune) {
+        this.commune = commune;
+    }
+
+    public Set<Candidat> getCandidats() {
+        return votesMap.keySet();
+    }
+
+    public Map<Candidat, Integer> getVotesMap() {
+        return votesMap;
+    }
+
+    public void addCandidat(Candidat candidat) {
+        votesMap.putIfAbsent(candidat, 0);
+        if (!this.commune.getCandidats().contains(candidat))
+            commune.addCandidat(candidat);
+    }
+
+    public void setVotesCandidat(Candidat c, int votes) {
+        votesMap.put(c, votes);
+    }
+
+    public int getVotesOf(Candidat c) {
         return votesMap.getOrDefault(c, 0);
     }
 
-    public static void traiterData(){
+    public static ArrayList<BureauVote> getAll() {
+        return bureauxExistants;
+    }
+
+    public static void traiterData() {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
-            while ((line = reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 traiterLigneData(line);
             }
         } catch (Exception e) {
-            // TODO: handle exception
+            System.out.println("fichier " + filePath + " impossible à lire");
         }
     }
 
-    private static void traiterLigneData(String line){
+    private static void traiterLigneData(String line) {
         String[] infos = line.split(":");
         if (infos.length != 2) return;
 
-        String[] infosCandidat = infos[1].split("->");
-        if (infosCandidat.length != 2) return;
+        String bvCode = infos[0].trim();
+        String[] candidatVotes = infos[1].split("->");
+        if (candidatVotes.length != 2) return;
 
-        String bvCode = infos[0];
-        String candidatName = infosCandidat[0];
-        int votes = Integer.parseInt(infosCandidat[1]);
+        String candidatName = candidatVotes[0].trim();
+        int votes;
+        try {
+            votes = Integer.parseInt(candidatVotes[1].trim());
+        } catch (NumberFormatException e) {
+            votes = 0;
+        }
 
         BureauVote bv = BureauVote.get(bvCode);
         Candidat candidat = Candidat.get(candidatName);
+
         bv.addCandidat(candidat);
         bv.setVotesCandidat(candidat, votes);
     }

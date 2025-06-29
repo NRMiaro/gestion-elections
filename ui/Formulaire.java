@@ -27,6 +27,8 @@ public class Formulaire extends JPanel {
 
         regionResearch.addActionListener(new RegionListener(regionResearch, districtResearch, communeResearch));
         districtResearch.addActionListener(new DistrictListener(districtResearch, communeResearch));
+
+        this.updateData();
     }
 
     public ArrayList<ArrayList<Object>> getData(){ 

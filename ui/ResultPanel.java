@@ -31,6 +31,7 @@ public class ResultPanel extends JPanel {
         table.refresh();
 
         // 2. Affichage texte
+        infoText.setText("");
         Region r = form.getRegion();
         District d = form.getDistrict();
         Commune c = form.getCommune();

@@ -1,6 +1,0 @@
-Ampitatafika;Antananarivo Atsimondrano:BV101;BV102
-Ambohimena;Antsirabe I:BV201;BV202
-Tanambao Verrerie;Toamasina I:BV301;BV302
-Ambatomanga;Arivonimamo:BV401
-Talata-Dondona;Soavinandriana:BV402
-Talata-Dondona;Miarinarivo;:BV403
